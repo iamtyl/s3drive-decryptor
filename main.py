@@ -2,6 +2,8 @@ import customtkinter as ctk
 from tkinter import filedialog, messagebox
 import os
 import threading
+import json
+import sys
 from decryption import decrypt_file
 from s3_downloader import get_s3_objects, download_from_s3
 
@@ -9,8 +11,8 @@ class S3DriveDecryptor(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("S3Drive Replica - Secure Decryptor")
-        self.geometry("600x750")
+        self.title("S3Drive Replica - Secure Decryptor [v0.1.1]")
+        self.geometry("600x800")
         
         # WHITE THEME as requested! 🤍
         ctk.set_appearance_mode("light")
@@ -20,11 +22,13 @@ class S3DriveDecryptor(ctk.CTk):
         self.selected_objects = []
 
         # --- UI LAYOUT ---
-        self.grid_columnconfigure(0, weight=1)
-
+        # Create a main scrollable container for the entire app content
+        self.main_container = ctk.CTkScrollableFrame(self)
+        self.main_container.pack(pady=0, padx=0, fill="both", expand=True)
+        
         # Connection Frame
-        self.conn_frame = ctk.CTkFrame(self)
-        self.conn_frame.pack(pady=20, padx=20, fill="x")
+        self.conn_frame = ctk.CTkFrame(self.main_container)
+        self.conn_frame.pack(pady=10, padx=20, fill="x")
         
         ctk.CTkLabel(self.conn_frame, text="AWS S3 Connection", font=("Arial", 16, "bold")).pack(pady=5)
         
@@ -34,8 +38,8 @@ class S3DriveDecryptor(ctk.CTk):
         self.region = self.create_input(self.conn_frame, "Region (e.g. us-east-1)")
 
         # Security Frame
-        self.sec_frame = ctk.CTkFrame(self)
-        self.sec_frame.pack(pady=20, padx=20, fill="x")
+        self.sec_frame = ctk.CTkFrame(self.main_container)
+        self.sec_frame.pack(pady=10, padx=20, fill="x")
         
         ctk.CTkLabel(self.sec_frame, text="Decryption Key", font=("Arial", 16, "bold")).pack(pady=5)
         
@@ -48,8 +52,8 @@ class S3DriveDecryptor(ctk.CTk):
         self.key_input.insert("1.0", "Enter Passphrase or Private Key here...")
 
         # S3 List Frame
-        self.list_frame = ctk.CTkFrame(self)
-        self.list_frame.pack(pady=20, padx=20, fill="both", expand=True)
+        self.list_frame = ctk.CTkFrame(self.main_container)
+        self.list_frame.pack(pady=10, padx=20, fill="both", expand=True)
 
         ctk.CTkLabel(self.list_frame, text="S3 Objects", font=("Arial", 16, "bold")).pack(pady=5)
         
@@ -63,12 +67,12 @@ class S3DriveDecryptor(ctk.CTk):
         self.checkboxes = {}
 
         # ACTION BUTTON
-        self.btn_decrypt = ctk.CTkButton(self, text="DOWNLOAD & DECRYPT", fg_color="blue", 
+        self.btn_decrypt = ctk.CTkButton(self.main_container, text="DOWNLOAD & DECRYPT", fg_color="blue", 
                                          hover_color="darkblue", command=self.start_decrypt_thread, font=("Arial", 14, "bold"))
         self.btn_decrypt.pack(pady=30)
 
         # Log
-        self.log = ctk.CTkTextbox(self, height=150)
+        self.log = ctk.CTkTextbox(self.main_container, height=150)
         self.log.pack(pady=10, padx=20, fill="x")
         self.write_log("Ready to decrypt! ✨")
 
