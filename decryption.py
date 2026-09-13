@@ -2,15 +2,19 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 import os
+import hashlib
 
 def decrypt_symmetric(ciphertext_blob, passphrase):
     """Decrypts data using a symmetric passphrase (AES-GCM)."""
-    import hashlib
-    key = hashlib.sha256(passphrase.encode()).digest()
+    if len(ciphertext_blob) < 28:
+        raise ValueError("Ciphertext blob is too short.")
+
+    salt = ciphertext_blob[:16]
+    key = hashlib.pbkdf2_hmac('sha256', passphrase.encode(), salt, 600000, dklen=32)
     
     aesgcm = AESGCM(key)
-    nonce = ciphertext_blob[:12]
-    ciphertext = ciphertext_blob[12:]
+    nonce = ciphertext_blob[16:28]
+    ciphertext = ciphertext_blob[28:]
     
     return aesgcm.decrypt(nonce, ciphertext, None)
 
