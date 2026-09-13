@@ -17,8 +17,14 @@ cd "$PROJECT_DIR"
 
 echo "🚀 Starting SECURE push to GitHub..."
 
-# Simple commit message for the decryptor
-COMMIT_MSG="Initial commit for S3Drive Decryptor"
+# Extract version from main.py (looks for [vX.X.X])
+VERSION=$(grep -o '\[v[0-9.]*\]' main.py | head -n 1 | tr -d '[]')
+
+if [ -z "$VERSION" ]; then
+    COMMIT_MSG="Commit for S3Drive Decryptor"
+else
+    COMMIT_MSG="Commit for S3Drive Decryptor $VERSION"
+fi
 
 git init
 git remote set-url origin "$AUTH_URL" 2>/dev/null || git remote add origin "$AUTH_URL"
