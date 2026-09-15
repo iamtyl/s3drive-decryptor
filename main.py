@@ -11,7 +11,7 @@ class S3DriveDecryptor(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("S3Drive Replica - Secure Decryptor [v0.1.3]")
+        self.title("S3Drive Replica - Secure Decryptor [v0.1.4]")
         self.geometry("600x800")
         
         # WHITE THEME 🤍
@@ -37,8 +37,8 @@ class S3DriveDecryptor(ctk.CTk):
         ctk.CTkLabel(self.conn_frame, text="AWS S3 Connection", font=("Arial", 16, "bold")).pack(pady=5)
         self.access_key = self.create_input(self.conn_frame, "AWS Access Key")
         self.secret_key = self.create_input(self.conn_frame, "AWS Secret Key", show="*")
-        self.bucket_name = self.create_input(self.conn_frame, "Bucket Name")
-        self.region = self.create_input(self.conn_frame, "Region (e.g. us-east-1)")
+        self.bucket_name = self.create_input(self.conn_frame, "S3 Bucket/Path (ARN)")
+        self.region = self.create_input(self.conn_frame, "Region (e.g. us-east-1)", default="ap-southeast-1")
 
         # Security Frame
         self.sec_frame = ctk.CTkFrame(self.main_container)
